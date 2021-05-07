@@ -2,18 +2,21 @@ import {HttpException, HttpStatus, Injectable, NotFoundException} from '@nestjs/
 import {Coffee} from "./entities/coffee.entity";
 import {CreateCoffeeDto} from "./dto/create-coffee.dto";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {Connection, Repository} from "typeorm";
 import {UpdateCoffeeDto} from "./dto/update-coffee.dto";
 import {Flavor} from "./entities/flavor.entity";
 import {PaginationQueryDto} from "../common/dto/pagination-query.dto";
+import {Event} from "../events/entities/event.entity";
 
-@Injectable()
-export class CoffeesService {
+
+  @Injectable()
+  export class CoffeesService {
   constructor(
     @InjectRepository(Coffee)
     private readonly coffeeRepository: Repository<Coffee>,
     @InjectRepository(Flavor)
-    private readonly flavorRepository: Repository<Flavor>
+    private readonly flavorRepository: Repository<Flavor>,
+    private readonly connetion: Connection,
   ) {}
 
   private async preloadFlavorByName(name:string):Promise<Flavor>{
@@ -53,7 +56,33 @@ export class CoffeesService {
   }
 
   async remove(id: string) {
-    const coffee = await this.findOne(id);
-    return this.coffeeRepository.remove(coffee);
+    const coffee = await this.findOne(id)
+    return this.coffeeRepository.remove(coffee)
+  }
+
+  async recommendCoffee(coffee:Coffee){
+    const queryRunner = this.connetion.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.startTransaction()
+
+    try{
+      coffee.recommendations++
+      const recommendEvent = new Event()
+      recommendEvent.name = 'recommend_coffee'
+      recommendEvent.type = 'coffee'
+      recommendEvent.payload = {coffeeId: coffee.id}
+
+      await queryRunner.manager.save(coffee)
+      await queryRunner.manager.save(recommendEvent)
+      await queryRunner.commitTransaction()
+    }
+    catch (err){
+      // error 발생 시 queryRunner에 저장했던 모든 작업 rollback
+      await queryRunner.rollbackTransaction()
+    }
+    finally{
+      //모든 작업 후에는 항상 connection 닫아준다.
+      await queryRunner.release()
+    }
   }
 }
