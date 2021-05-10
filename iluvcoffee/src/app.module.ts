@@ -18,7 +18,7 @@ import { UsersModule } from './users/users.module';
       database: 'postgres', // name of our database,
       autoLoadEntities: true, // models will be loaded automatically
       synchronize: true, // your entities will be synced with the database(recommended: disable in prod)
-      // logging: true
+      logging: true
     })],
   controllers: [AppController],
   providers: [AppService],
