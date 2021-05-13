@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable, NotFoundException} from '@nestjs/common';
+import {HttpException, HttpStatus, Inject, Injectable, NotFoundException, Scope} from '@nestjs/common';
 import {Coffee} from "./entities/coffee.entity";
 import {CreateCoffeeDto} from "./dto/create-coffee.dto";
 import {InjectRepository} from "@nestjs/typeorm";
@@ -7,9 +7,13 @@ import {UpdateCoffeeDto} from "./dto/update-coffee.dto";
 import {Flavor} from "./entities/flavor.entity";
 import {PaginationQueryDto} from "../common/dto/pagination-query.dto";
 import {Event} from "../events/entities/event.entity";
+import {COFFEE_BRANDS} from "./coffees.constants";
+import {ConfigService, ConfigType} from "@nestjs/config";
+import coffeesConfig from "./config/coffees.config"
 
 
-  @Injectable()
+  // @Injectable({scope: Scope.REQUEST})
+@Injectable()
   export class CoffeesService {
   constructor(
     @InjectRepository(Coffee)
@@ -17,7 +21,20 @@ import {Event} from "../events/entities/event.entity";
     @InjectRepository(Flavor)
     private readonly flavorRepository: Repository<Flavor>,
     private readonly connetion: Connection,
-  ) {}
+    // @Inject('COFFEE_BRANDS') coffeeBrands:string[]
+    //@Inject(COFFEE_BRANDS) coffeeBrands:string[]
+    private readonly configService: ConfigService,
+    @Inject(coffeesConfig.KEY)
+    private readonly coffeesConfiguration: ConfigType<typeof coffeesConfig>
+  ) {
+    // console.log(coffeeBrands)
+    //console.log('coffeeService Initiated')
+    //const dbHost = this.configService.get('database.user') // dot(.) notation은 user 속성의 path다.
+    //const dbHost = this.configService.get<string>('DATABASE_HOST', 'localhost')
+    //const coffeesConfig = this.configService.get('coffees.foo')
+    console.log(coffeesConfiguration)
+    console.log(coffeesConfiguration.foo)
+  }
 
   private async preloadFlavorByName(name:string):Promise<Flavor>{
     const existingFlavor = await this.flavorRepository.findOne({name})
@@ -38,7 +55,7 @@ import {Event} from "../events/entities/event.entity";
   async findOne(id: string) {
     const coffee = await this.coffeeRepository.findOne(id, {relations: ['flavors']})
     if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
-    return coffee;
+    return coffee
   }
 
   async create(createCoffeeDto: CreateCoffeeDto) {
@@ -48,9 +65,14 @@ import {Event} from "../events/entities/event.entity";
     return this.coffeeRepository.save(coffee)
   }
 
+
+
+
   async update(id: string, updateCoffeeDto: UpdateCoffeeDto) {
-    const flavors = updateCoffeeDto.flavors && (await Promise.all(updateCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name))))
-    const coffee = await this.coffeeRepository.preload({id: +id, ...updateCoffeeDto, flavors})
+
+    const coffee=undefined
+    //const flavors = updateCoffeeDto.flavors && (await Promise.all(updateCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name))))
+    // const coffee = await this.coffeeRepository.preload({id: +id, ...updateCoffeeDto, flavors})
     if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
     return this.coffeeRepository.save(coffee)
   }

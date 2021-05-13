@@ -21,6 +21,7 @@ export class Coffee{
     {cascade: true}
   )
   flavors: Flavor[]
+  // flavors: Promise<Flavor[]>
 }
 //related Enrriry, which property needss tto be selected 'inverse side'
 //flavors - coffee에서 owner는 커피다. Jointable coffee에서 명시했으니까.
