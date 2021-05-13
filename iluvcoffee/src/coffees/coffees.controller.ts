@@ -27,10 +27,10 @@ export class CoffeesController {
   }
 
   @Post()
-  // @HttpCode(HttpStatus.GONE)
-  create(@Body() createCoffeeDto:CreateCoffeeDto){
-    console.log(createCoffeeDto instanceof CreateCoffeeDto )
-    return this.coffeesService.create(createCoffeeDto)
+    // @HttpCode(HttpStatus.GONE)
+    create(@Body() createCoffeeDto:CreateCoffeeDto){
+      console.log(createCoffeeDto instanceof CreateCoffeeDto )
+      return this.coffeesService.create(createCoffeeDto)
   }
   // create(@Body() body){
   //   return this.coffeesService.create(body)
