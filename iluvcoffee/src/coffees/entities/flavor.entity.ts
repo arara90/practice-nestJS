@@ -11,6 +11,5 @@ export class Flavor {
   name: string
 
   @ManyToMany(type=>Coffee, coffee=>coffee.flavors)
-  // coffees: Promise<Coffee[]>
   coffees: Coffee[]
 }

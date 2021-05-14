@@ -21,6 +21,5 @@ export class Coffee{
     {cascade: []}
   )
   flavors: Flavor[]
-  //flavors: Promise<Flavor[]>
 }
 
