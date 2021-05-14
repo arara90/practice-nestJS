@@ -43,6 +43,7 @@ import {Event} from "../events/entities/event.entity";
 
   async findLazy(id: string) {
     const coffee = await this.connetion.getRepository(Coffee).findOne(id)
+    const coffee2 = await this.connetion.getRepository(Coffee).findOne('15')
     //const coffee = await this.connetion.getRepository(Coffee).findOne({name:'new'})
     //const rc = await this.connetion.getRepository(Coffee).findOne(14, {relations:['flavors']})
 
@@ -50,18 +51,18 @@ import {Event} from "../events/entities/event.entity";
     console.log('coffee[\'__has_flavors__\']', coffee['__has_flavors__'])  //undefined
     console.log('coffee', coffee) // Coffee { id: 14, name: 'new', brand: 'ss', recommendations: 0 }
 
+
     console.log('------------------------coffee.flavors----------------------')
     const flavors = await coffee.flavors
+
     console.log('------------------------------------------------------------')
     console.log('flavors', flavors) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
-
-    console.log('------------------------rc----------------------')
     console.log('rc.flavors', coffee.flavors) //Promise {[ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]}
-    //console.log('rc.flavors[0]', coffee.flavors[0]) //undefined
-    console.log('rc[__flavors__]', coffee['__flavors__']) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+    console.log('coffee[\'__has_flavors__\']', coffee['__has_flavors__']) //true
+    console.log('coffee', coffee)
 
     if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
-    return coffee
+    return [coffee, coffee2]
     }
 
     async findEager(id:string) {
