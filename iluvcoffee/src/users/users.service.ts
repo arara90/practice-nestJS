@@ -21,6 +21,12 @@ export class UsersService {
   findOne(id:string){
     const user = this.userRepository.findOne(id)
     if(!user) throw new NotFoundException(`User ${id} Not Found`)
+      return user
+    }
+
+  findOneByParam(param:object){
+    const user = this.userRepository.findOne(param)
+    if(!user) throw new NotFoundException(`User ${param} Not Found`)
     return user
   }
 

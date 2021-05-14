@@ -36,23 +36,69 @@ import {Event} from "../events/entities/event.entity";
   }
 
   async findOne(id: string) {
-    const coffee = await this.coffeeRepository.findOne(id, {relations: ['flavors']})
+    const coffee = await this.coffeeRepository.findOne(id)
     if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
     return coffee;
   }
 
+  async findLazy(id: string) {
+    const coffee = await this.connetion.getRepository(Coffee).findOne(id)
+    //const coffee = await this.connetion.getRepository(Coffee).findOne({name:'new'})
+    //const rc = await this.connetion.getRepository(Coffee).findOne(14, {relations:['flavors']})
+
+    console.log('------------------------coffee---------------------')
+    console.log('coffee[\'__has_flavors__\']', coffee['__has_flavors__'])  //undefined
+    console.log('coffee', coffee) // Coffee { id: 14, name: 'new', brand: 'ss', recommendations: 0 }
+
+    console.log('------------------------coffee.flavors----------------------')
+    const flavors = await coffee.flavors
+    console.log('------------------------------------------------------------')
+    console.log('flavors', flavors) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+
+    console.log('------------------------rc----------------------')
+    console.log('rc.flavors', coffee.flavors) //Promise {[ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]}
+    //console.log('rc.flavors[0]', coffee.flavors[0]) //undefined
+    console.log('rc[__flavors__]', coffee['__flavors__']) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+
+    if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
+    return coffee
+    }
+
+    async findEager(id:string) {
+      const coffee = await this.connetion.getRepository(Coffee).findOne(id)
+      //const coffee = await this.connetion.getRepository(Coffee).findOne({name:'new'})
+      //const rc = await this.connetion.getRepository(Coffee).findOne(14, {relations:['flavors']})
+
+      console.log('------------------------coffee---------------------')
+      console.log('coffee[\'__has_flavors__\']', coffee['__has_flavors__'])  //undefined
+      console.log('coffee', coffee) // Coffee { id: 14, name: 'new', brand: 'ss', recommendations: 0 }
+
+      console.log('------------------------coffee.flavors----------------------')
+      const flavors = coffee.flavors //not exists
+      console.log('------------------------------------------------------------')
+      console.log('flavors', flavors) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+
+      console.log('------------------------coffee again----------------------')
+      console.log('rc.flavors', coffee.flavors) //Promise {[ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]}
+      //console.log('rc.flavors[0]', coffee.flavors[0]) //undefined
+      console.log('rc[__flavors__]', coffee['__flavors__']) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+
+      if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
+      return coffee
+    }
+
   async create(createCoffeeDto: CreateCoffeeDto) {
     //flavor가 존재하면 가져오고, 없으면 create해서 담아옴.
-    const flavors = await Promise.all(createCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name)))
-    const coffee = this.coffeeRepository.create({...createCoffeeDto, flavors})
-    return this.coffeeRepository.save(coffee)
+    // const flavors = await Promise.all(createCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name)))
+    // const coffee = this.coffeeRepository.create({...createCoffeeDto, flavors})
+    // return this.coffeeRepository.save(coffee)
   }
 
   async update(id: string, updateCoffeeDto: UpdateCoffeeDto) {
-    const flavors = updateCoffeeDto.flavors && (await Promise.all(updateCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name))))
-    const coffee = await this.coffeeRepository.preload({id: +id, ...updateCoffeeDto, flavors})
-    if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
-    return this.coffeeRepository.save(coffee)
+    // const flavors = updateCoffeeDto.flavors && (await Promise.all(updateCoffeeDto.flavors.map(name=>this.preloadFlavorByName(name))))
+    // const coffee = await this.coffeeRepository.preload({id: +id, ...updateCoffeeDto, flavors})
+    // if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
+    // return this.coffeeRepository.save(coffee)
   }
 
   async remove(id: string) {

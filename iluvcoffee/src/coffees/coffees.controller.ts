@@ -21,6 +21,16 @@ export class CoffeesController {
     return this.coffeesService.findAll(paginationQuery)
   }
 
+  @Get('lazy/:id')
+  findLazy(@Param('id') id:number){
+    return this.coffeesService.findLazy('' + id)
+  }
+
+  @Get('eager/:id')
+  findEager(@Param('id') id:number){
+    return this.coffeesService.findEager('' + id)
+  }
+
   @Get(':id')
   findOne(@Param('id') id:number){
     return this.coffeesService.findOne('' + id)
