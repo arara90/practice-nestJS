@@ -74,13 +74,13 @@ import {Event} from "../events/entities/event.entity";
       console.log('coffee', coffee) // Coffee { id: 14, name: 'new', brand: 'ss', recommendations: 0 }
 
       console.log('------------------------coffee.flavors----------------------')
-      const flavors = coffee.flavors //not exists
-      console.log('------------------------------------------------------------')
+      const flavors = coffee.flavors
       console.log('flavors', flavors) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
+      console.log('------------------------------------------------------------')
+
 
       console.log('------------------------coffee again----------------------')
       console.log('rc.flavors', coffee.flavors) //Promise {[ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]}
-      //console.log('rc.flavors[0]', coffee.flavors[0]) //undefined
       console.log('rc[__flavors__]', coffee['__flavors__']) // [ Flavor { id: 8, name: 'white' }, Flavor { id: 9, name: 'oat' } ]
 
       if(!coffee) throw new NotFoundException(`Coffee ${id} Not Found`)
