@@ -1,8 +1,16 @@
 import { PartialType } from "@nestjs/mapped-types";
 import {CreateCoffeeDto} from "./create-coffee.dto";
-import {IsNumber, IsString} from "class-validator";
+import {IsNumber, IsOptional, IsString, ValidateNested} from "class-validator";
+import {Type} from "class-transformer";
+import {CreateDetailDto} from "./create-detail.dto"
+import {UpdateDetailDto} from "./update-detail.dto";
+// import {UpdateDetailDto} from "./update-detail.dto"
 
-export class UpdateCoffeeDto extends PartialType(CreateCoffeeDto){}
+export class UpdateCoffeeDto extends PartialType(CreateCoffeeDto){
+  @IsOptional()
+  @IsNumber()
+  readonly id ?: number
+}
 //
 //
 
